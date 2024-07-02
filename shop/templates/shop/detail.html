@@ -48,16 +48,31 @@
         <!-- Product section-->
         <section class="py-5">
             <div class="container px-4 px-lg-5 my-5">
+                        
+                           
+                            <div class="col-1">
+                    <a class="btn btn-outline-dark mt-auto" href="{% url 'edit' product.id %}"> Edit </a>
+                </div>
+                                    <div class="col-1">
+                    <a class="btn btn-outline-dark mt-auto" href="{% url 'delete' product.id %}"> Delete </a>
+                </div>
+                        
+                
                 <div class="row gx-4 gx-lg-5 align-items-center">
-                    <div class="col-md-6"><img class="card-img-top mb-5 mb-md-0" src="https://dummyimage.com/600x700/dee2e6/6c757d.jpg" alt="..." /></div>
+                    
+                    <div class="col-md-6"><img class="card-img-top mb-5 mb-md-0" src="{{ product.image.url }}" alt="..." /></div>
                     <div class="col-md-6">
-                        <div class="small mb-1">Rating: 124 </div>
-                        <h1 class="display-5 fw-bolder">Shop item template</h1>
+                        <div class="small mb-1">Rating: {{ product.rating }} </div>
+                        <h1 class="display-5 fw-bolder">{{ product.name }}</h1>
+                        
                         <div class="fs-5 mb-5">
-                            <span class="text-decoration-line-through">$45.00</span>
-                            <span>$40.00</span>
+                            <span class="text-decoration-line-through">${{ product.price }}</span>
+                            <span>${{ product.discounted_price }}</span>
                         </div>
-                        <p class="lead">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium at dolorem quidem modi. Nam sequi consequatur obcaecati excepturi alias magni, accusamus eius blanditiis delectus ipsam minima ea iste laborum vero?</p>
+                        {% for product in products %}
+                        {% endfor %}
+                        <p class="lead">{{ product.description }}</p>
+                        
                         <div class="d-flex">
                             <form>
                                 <div class="form-group">
@@ -83,6 +98,7 @@
                         </div>
                     </div>
                 </div>
+                
             </div>
         </section>
 
