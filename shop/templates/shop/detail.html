@@ -68,7 +68,8 @@
                         <p class="lead">{{ product.description }}</p>
                         
                         <div class="d-flex">
-                            <form>
+                            <form method="post" action="{% url 'add_order' product.id %}">
+                            {% csrf_token %}
                                 <div class="form-group">
                                     <h2>Place an order</h2>
                                 </div>
@@ -77,8 +78,8 @@
                                   <input type="text" class="form-control"  placeholder="Your name">
                                 </div>
                                 <div class="form-group mb-3">
-                                  <label for="formGroupExampleInput2">Your phone</label>
-                                  <input type="text" class="form-control" placeholder="Your phone">
+                                  <label for="formGroupExampleInput2">Your email</label>
+                                  <input type="text" class="form-control" placeholder="Your email">
                                 </div>
                                 
                                {% for product in products %}
