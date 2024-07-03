@@ -110,13 +110,16 @@ def add_comment(request,product_id):
 def add_order(request,product_id):
     product = get_object_or_404(Product, id=product_id)
     if request.method == 'POST':
-        form = OrderModelForm
+        form = OrderModelForm(request.POST)
         if form.is_valid():
-            form.save()
+            new_order = form.save(commit=False)
+
+            new_order.product = product
+            new_order.save()
             return redirect('product_detail',product_id)
     else:
         form = OrderModelForm(request.GET)
 
-    return render(request,'shop/detail.html',{'form':form,'product':product})
+    return render(request,'shop/detail.html',{'form': form, 'product': product})
 
 

@@ -75,20 +75,25 @@
                                 </div>
                                 <div class="form-group mb-3">
                                   <label for="formGroupExampleInput">Your name</label>
-                                  <input type="text" class="form-control"  placeholder="Your name">
+                                  <input type="text" name="name" class="form-control"  placeholder="Your name">
                                 </div>
                                 <div class="form-group mb-3">
                                   <label for="formGroupExampleInput2">Your email</label>
-                                  <input type="text" class="form-control" placeholder="Your email">
+                                  <input type="text" name="email" class="form-control" placeholder="Your email">
                                 </div>
-                                
-                               {% for product in products %}
-                                {% endfor %}
-                                  <div class="form-group mb-3">
+                                <div class="form-group mb-3">
+                                  <label for="formGroupExampleInput2">Quantity</label>
+                                  <input type="number" name="quantity" class="form-control" placeholder="Quantity">
+                                </div>
+                            <div class="form-group mb-3">
                                    
                                     <input type="text" class="btn btn-success" value="Send">
                                   </div>
                               </form>
+                                
+                               {% for product in products %}
+                                {% endfor %}
+                                  
                            
                         </div>
                     </div>
