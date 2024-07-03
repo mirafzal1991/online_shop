@@ -1,5 +1,5 @@
 from django import forms
-from shop.models import Product,User
+from shop.models import Product,User,Comment,Order
 
 
 
@@ -30,3 +30,15 @@ class LoginForm(forms.Form):
         except User.DoesNotExist:
             raise forms.ValidationError(f'{email} does not exists')
         return password
+
+
+class CommentModelForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ('name', 'email', 'body')
+
+class OrderModelForm(forms.ModelForm):
+
+    class Meta:
+        model = Order
+        fields = ('name','email')

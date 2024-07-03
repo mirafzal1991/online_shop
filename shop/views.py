@@ -1,17 +1,22 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from shop.forms import LoginForm
+from shop.forms import LoginForm,CommentModelForm,OrderModelForm
 
 
 from shop.forms import ProductModelForm
 from shop.models import Product
-
+from django.db.models import Q
 
 # Create your views here.
 
 def product_list(request):
-    products = Product.objects.all()
+    search_query = request.GET.get('search')
+    if search_query:
+        products = Product.objects.filter(Q(name__icontains=search_query))
+    else:
+        products = Product.objects.all()
+
     context = {'products': products}
     return render(request,'shop/home.html',context)
 
@@ -33,8 +38,16 @@ def add_product(request):
 
 def product_detail(request, product_id):
     product = Product.objects.get(id=product_id)
+    category = product.category
+    related_products = Product.objects.filter(category=category).exclude(id=product_id)
+    comments = product.comments.filter(is_possible=True)
 
-    context = {'product': product}
+    context = {
+        'product': product,
+        'comments': comments,
+        'related_products':related_products,
+
+    }
     return render(request,'shop/detail.html', context)
 @login_required(login_url='login')
 def edit_product(request, product_id):
@@ -78,5 +91,32 @@ def logout_page(request):
         logout(request)
         return redirect('products')
     return render(request, 'shop/logout.html')
+
+def add_comment(request,product_id):
+    product = get_object_or_404(Product, id=product_id)
+    if request.method == 'POST':
+        form = CommentModelForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+
+            comment.product = product
+            comment.save()
+            return redirect('product_detail', product_id)
+    else:
+        form = CommentModelForm(request.GET)
+
+    return render(request, 'shop/detail.html', {'form': form, 'product': product})
+
+def add_order(request,product_id):
+    product = get_object_or_404(Product, id=product_id)
+    if request.method == 'POST':
+        form = OrderModelForm
+        if form.is_valid():
+            form.save()
+            return redirect('product_detail',product_id)
+    else:
+        form = OrderModelForm(request.GET)
+
+    return render(request,'shop/detail.html',{'form':form,'product':product})
 
 
