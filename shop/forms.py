@@ -42,3 +42,23 @@ class OrderModelForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = ('name','email','quantity')
+
+class RegisterModelForm(forms.ModelForm):
+    confirm_password = forms.CharField(max_length=255)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+
+    def clean_email(self):
+        email = self.data.get('email').lower()
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError('Email already registered')
+        return email
+
+    def clean_password(self):
+        password = self.data.get('password')
+        confirm_password = self.data.get('confirm_password')
+        if password != confirm_password:
+            raise forms.ValidationError('Password didn\'t match')
+        return password

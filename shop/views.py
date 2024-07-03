@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from shop.forms import LoginForm,CommentModelForm,OrderModelForm
+from shop.forms import LoginForm,CommentModelForm,OrderModelForm,RegisterModelForm
 
 
 from shop.forms import ProductModelForm
@@ -121,5 +121,21 @@ def add_order(request,product_id):
         form = OrderModelForm(request.GET)
 
     return render(request,'shop/detail.html',{'form': form, 'product': product})
+
+def register_page(request):
+    if request.method == 'POST':
+        form = RegisterModelForm(request.POST)
+        if form.is_valid():
+            form.save()
+            redirect('products')
+    else:
+        form = RegisterModelForm()
+    return render(request, 'shop/register.html',{'form':form})
+
+
+
+
+
+
 
 
