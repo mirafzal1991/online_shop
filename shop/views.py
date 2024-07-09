@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from shop.forms import LoginForm,CommentModelForm,OrderModelForm,RegisterModelForm
-
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 from shop.forms import ProductModelForm
 from shop.models import Product
@@ -11,13 +11,23 @@ from django.db.models import Q
 # Create your views here.
 
 def product_list(request):
+
     search_query = request.GET.get('search')
     if search_query:
         products = Product.objects.filter(Q(name__icontains=search_query))
     else:
+        page = request.GET.get('page','')
         products = Product.objects.all()
+        paginator = Paginator(products, 3)
+        try:
+            page_obj = paginator.page(page)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
 
-    context = {'products': products}
+
+    context = {'products': products, 'page_obj': page_obj}
     return render(request,'shop/home.html',context)
 
 @login_required(login_url='login')
@@ -65,9 +75,9 @@ def edit_product(request, product_id):
     return render(request, 'shop/edit-product.html', context)
 @login_required(login_url='login')
 def delete_product(request, product_id):
-    customer = Product.objects.get(id=product_id)
-    if customer:
-        customer.delete()
+    product = Product.objects.get(id=product_id)
+    if product:
+        product.delete()
 
         return redirect('products')
 
