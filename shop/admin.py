@@ -9,3 +9,4 @@ admin.site.register(Category)
 admin.site.register(Order)
 admin.site.register(Comment)
 admin.site.register(User)
+
