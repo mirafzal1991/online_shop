@@ -48,12 +48,12 @@ class RegisterModelForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email']
+        fields = ['username', 'email', 'password']
 
     def clean_email(self):
         email = self.data.get('email').lower()
         if User.objects.filter(email=email).exists():
-            raise forms.ValidationError('Email already registered')
+            raise forms.ValidationError(f'The {email} is already registered')
         return email
 
     def clean_password(self):
@@ -62,3 +62,9 @@ class RegisterModelForm(forms.ModelForm):
         if password != confirm_password:
             raise forms.ValidationError('Password didn\'t match')
         return password
+
+class EmailForm(forms.Form):
+    subject = forms.CharField(max_length=200)
+    message = forms.CharField(widget=forms.Textarea)
+    email_from = forms.EmailField(max_length=200)
+    email_to = forms.EmailField(max_length=200)

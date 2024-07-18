@@ -1,12 +1,20 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from shop.forms import LoginForm,CommentModelForm,OrderModelForm,RegisterModelForm
+from shop.forms import LoginForm,CommentModelForm,OrderModelForm,RegisterModelForm, EmailForm
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 from shop.forms import ProductModelForm
 from shop.models import Product
 from django.db.models import Q
+from django.core.mail import send_mail
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.template.loader import render_to_string
+from shop.tokens import account_activation_token
+from django.core.mail import EmailMessage
+from django.contrib import messages
 
 # Create your views here.
 
@@ -136,11 +144,51 @@ def register_page(request):
     if request.method == 'POST':
         form = RegisterModelForm(request.POST)
         if form.is_valid():
-            form.save()
-            redirect('products')
+            user = form.save(commit=False)
+            password = form.cleaned_data['password']
+            user.set_password(password)
+            if not user.is_active:
+                current_site = get_current_site(request)
+                user = request.user
+                email = request.user.email
+                subject = "Verify Email"
+                message = render_to_string('shop/verify_email_message.html', {
+                    'request': request,
+                    'user': user,
+                    'domain': current_site.domain,
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': account_activation_token.make_token(user),
+                })
+                email = EmailMessage(
+                    subject, message, to=[email]
+                )
+                email.content_subtype = 'html'
+                email.send()
+                return redirect('verify-email-done')
+            else:
+                return redirect('register')
+        return render(request, 'shop/verify_email_message.html')
+        user.save()
+
+        send_mail('Register','Successfully registered','mirobitovmirafzalpython@gmail.com',[user.email],fail_silently=False)
+        return redirect('products')
     else:
         form = RegisterModelForm()
     return render(request, 'shop/register.html',{'form':form})
+
+def send_email(request):
+    form = EmailForm()
+    if request.method == 'POST':
+        form = EmailForm(request.POST)
+        if form.is_valid():
+            send_mail(form.cleaned_data['subject'],form.cleaned_data['message'],form.cleaned_data['email_from'],[form.cleaned_data['email_to']],fail_silently=False)
+
+            return redirect('products')
+    context = {'form': form}
+    return render(request,'shop/send-mail.html',context)
+
+
+
 
 
 
